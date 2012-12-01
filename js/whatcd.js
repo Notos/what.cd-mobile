@@ -94,3 +94,26 @@ function getNews(callback) {
 		}
 	});
 }
+function inbox(callback) {
+	$.ajax({
+		url: '../ajax.php',
+		type: 'GET',
+		dataType: 'json',
+		data: {
+			action: 'inbox',
+		},
+		success: function (data) {
+			console.log(data);
+			callback(data);
+		}
+	});
+}
+function torrents(callback) {
+	callback(null);
+}
+function forums(callback) {
+	callback(null);
+}
+function subscriptions(callback) {
+	callback(null);
+}

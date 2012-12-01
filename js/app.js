@@ -19,27 +19,55 @@ App.ApplicationController = Ember.Controller.extend({
 	loggedIn:false,
 	authkey:null,
 	user:null,
-	info:null
+	hasMessages:null,
+	inbox:null
 });
-
 
 App.ApplicationView = Ember.View.extend({
 	templateName:'application',
 });
-App.NavbarView = Ember.View.extend({
-	templateName:'navbar',
+
+App.NavigationController = Ember.Controller.extend({
+	selected: null
 });
+App.NavbarView = Ember.View.extend({
+	templateName: 'navbar',
+	NavItemView: Ember.View.extend({
+		tagName: 'li',
+		classNameBindings: 'isActive:active'.w(),
+		isActive: function() {
+			return this.get('item') === App.NavigationController.selected;
+		}.property('item').cacheable()
+	})
+});
+
 App.IndexView = Ember.View.extend({
 	templateName:'index',
 });
 App.LoginFormView = Ember.View.extend({
 	templateName:'login-form'
 });
+
+App.InboxView = Ember.View.extend({
+	templateName: 'inbox',
+});
 App.AlertsView = Ember.View.extend({
 	templateName:'alerts',
 });
 App.NewsView= Ember.View.extend({
 	templateName:'news',
+});
+
+App.TorrentsView = Ember.View.extend({
+	templateName: 'torrents',
+});
+
+App.ForumsView = Ember.View.extend({
+	templateName: 'forums',
+});
+
+App.SubscriptionsView = Ember.View.extend({
+	templateName: 'subscriptions',
 });
 
 App.Router = Ember.Router.extend({
@@ -62,6 +90,7 @@ App.Router = Ember.Router.extend({
 						App.ApplicationController.user = null;
 					}
 					router.get('applicationController').connectOutlet('index');
+					App.NavigationController.selected = 'index';
 				});
 			}
 		}),
@@ -78,7 +107,45 @@ App.Router = Ember.Router.extend({
 					router.transitionTo('root.index');
 				});
 			}
-		})
+		}),
+		inbox: Ember.Route.extend({
+			route: '/inbox',
+			connectOutlets: function(router) {
+				inbox(function (data) {
+					App.ApplicationController.hasMessages = data.response.pages > 0;
+					App.ApplicationController.inbox = data.response;
+					App.NavigationController.selected = 'inbox';
+					router.get('applicationController').connectOutlet('inbox');
+				});
+			}
+		}),
+		torrents: Ember.Route.extend({
+			route: '/torrents',
+			connectOutlets: function(router) {
+				torrents(function (data) {
+					router.get('applicationController').connectOutlet('torrents');
+					App.NavigationController.selected = 'torrents';
+				});
+			}
+		}),
+		forums: Ember.Route.extend({
+			route: '/forums',
+			connectOutlets: function(router) {
+				torrents(function (data) {
+					router.get('applicationController').connectOutlet('forums');
+					App.NavigationController.selected = 'forums';
+				});
+			}
+		}),
+		subscriptions: Ember.Route.extend({
+			route: '/subscriptions',
+			connectOutlets: function(router) {
+				torrents(function (data) {
+					router.get('applicationController').connectOutlet('subscriptions');
+					App.NavigationController.selected = 'subscriptions';
+				});
+			}
+		}),
 	})
 });
 
